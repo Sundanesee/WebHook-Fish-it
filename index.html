@@ -2,71 +2,53 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Secure Discord Webhook</title>
+  <title>Fish It Auto Webhook v3 (Silent Mode)</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
       background: #0d1117;
       color: #fff;
-      padding: 50px;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
     }
-    button {
-      background: #5865F2;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      margin-top: 20px;
-    }
-    button:hover {
-      background: #4752C4;
-    }
-    .box {
+    .status {
       background: #161b22;
-      border-radius: 10px;
       padding: 20px;
-      margin: auto;
-      width: 90%;
-      max-width: 400px;
+      border-radius: 10px;
+      display: inline-block;
+      margin-top: 30px;
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2>🔒 Secure Webhook Tester</h2>
-    <p>Klik tombol di bawah untuk kirim pesan ke Discord.</p>
-    <button id="send">Kirim Pesan Aman</button>
+  <h1>🐟 Fish It Auto Webhook v3</h1>
+  <p>Mode senyap aktif — siap menerima data ikan dari game.</p>
+
+  <div class="status">
+    <p id="status">💤 Menunggu data tangkapan...</p>
   </div>
 
   <script>
-    // ================================
-    // GANTI BAGIAN DI BAWAH INI 🔻
+    // ======== GANTI DENGAN WEBHOOK DISCORD KAMU ========
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1437172334388842662/xapgUYeRWaiAA_1-FnPd4f80AMsdh_dEJvTjwznBNVjUjOM5rRuplsN5L_c7s5RZqYe0";
-    const SECRET_KEY = "vyp231oa21";
-    // ================================
+    // ===================================================
 
-    document.getElementById("send").addEventListener("click", async () => {
-      const inputKey = prompt("Masukkan kunci rahasia:");
-      if (!inputKey) return alert("❌ Tidak ada key dimasukkan.");
-      if (inputKey !== SECRET_KEY) return alert("❌ Key salah, akses ditolak!");
-
+    // Fungsi kirim otomatis ke Discord
+    async function kirimKeDiscord(data) {
       const payload = {
-        username: "Fish It Hook",
+        username: "Fish It Auto Hook",
         avatar_url: "https://i.ibb.co/vqFXG7v/hook.png",
         embeds: [{
-          title: "🎣 My Webhook",
-          description: "Kamu mendapatkan ikan **Langka!** 🐟",
-          color: 0x5865F2,
+          title: "🎣 Tangkap Ikan Baru!",
+          description: "Sistem mendeteksi hasil tangkapan dari Fish It!",
+          color: 0x00aaff,
           fields: [
-            { name: "🐠 Nama Ikan", value: "> Swordfish", inline: false },
-            { name: "⭐ Tier", value: "> Rare", inline: false },
-            { name: "⚖️ Berat", value: "> 7.4 Kg", inline: false },
-            { name: "💰 Harga Jual", value: "> $240", inline: false }
+            { name: "🐠 Nama Ikan", value: `> ${data.nama}`, inline: false },
+            { name: "⭐ Tier", value: `> ${data.tier}`, inline: false },
+            { name: "⚖️ Berat", value: `> ${data.berat} Kg`, inline: false },
+            { name: "💰 Harga", value: `> ${data.harga}`, inline: false }
           ],
-          footer: { text: "Webhook System | " + new Date().toLocaleString() }
+          footer: { text: "Fish It Auto Webhook v3 | " + new Date().toLocaleString() }
         }]
       };
 
@@ -76,15 +58,27 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
-        if (res.ok) {
-          alert("✅ Pesan berhasil dikirim ke Discord!");
-        } else {
-          alert("❌ Gagal mengirim! Status: " + res.status);
-        }
+        document.getElementById("status").innerText = res.ok
+          ? "✅ Data berhasil dikirim ke Discord!"
+          : "❌ Gagal kirim: " + res.status;
       } catch (err) {
-        alert("⚠️ Error: " + err.message);
+        document.getElementById("status").innerText = "⚠️ Error: " + err.message;
       }
-    });
+    }
+
+    // Ambil data ikan dari parameter URL
+    const params = new URLSearchParams(window.location.search);
+    const nama = params.get("nama");
+    const tier = params.get("tier");
+    const berat = params.get("berat");
+    const harga = params.get("harga");
+
+    if (nama && tier && berat && harga) {
+      kirimKeDiscord({ nama, tier, berat, harga });
+      document.querySelector("p").innerText = "🎣 Mengirim data tangkapan ke Discord...";
+    } else {
+      document.getElementById("status").innerText = "💤 Tidak ada data dari game.";
+    }
   </script>
 </body>
 </html>
