@@ -45,7 +45,7 @@
 
   <script>
     // 🔧 Ganti dengan webhook Discord kamu
-    const WEBHOOK_URL = "https://discord.com/api/webhooks/1437172334388842662/xapgUYeRWaiAA_1-FnPd4f80AMsdh_dEJvTjwznBNVjUjOM5rRuplsN5L_c7s5RZqYe0";
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/ISI_WEBHOOK_KAMU_DI_SINI";
 
     async function kirimKeDiscord(data) {
       const payload = {
@@ -102,104 +102,71 @@
     }
   </script>
 </body>
-</html>    
+</html>  <p>Kirim data tangkapan ikan langsung ke Discord</p>
 
+  <input id="nama" placeholder="Nama Ikan">
+  <input id="tier" placeholder="Tier (Common/Epic)">
+  <input id="berat" placeholder="Berat (kg)">
+  <input id="harga" placeholder="Harga (Rp)">
+  <button onclick="kirimManual()">Kirim</button>
+  <p id="status"></p>
 
-// Ganti dengan webhook Discord kamu sendiri
+  <script>
+    // 🔧 Ganti dengan webhook Discord kamu
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1437172334388842662/xapgUYeRWaiAA_1-FnPd4f80AMsdh_dEJvTjwznBNVjUjOM5rRuplsN5L_c7s5RZqYe0";
 
-    function sendToDiscord() {
-      const nama = document.getElementById('fishName').value;
-      const tier = document.getElementById('fishTier').value;
-      const berat = document.getElementById('fishWeight').value;
-      const harga = document.getElementById('fishPrice').value;
-
+    async function kirimKeDiscord(data) {
       const payload = {
-        username: "🐟 Fish It AutoHook",
+        username: "Fish It Auto Hook",
         avatar_url: "https://i.ibb.co/vqKFGXv/hook.png",
         embeds: [{
-          title: `🎣 Tangkap Ikan Baru!`,
-          description: `**Nama:** ${nama}\n**Tier:** ${tier}\n**Berat:** ${berat} kg\n**Harga:** Rp ${harga}`,
-          color: 0x00AEFF
+          title: "🎣 Tangkap Ikan Baru",
+          description: "Sistem mendeteksi hasil tangkapan dari Fish It!",
+          color: 0x00AAFF,
+          fields: [
+            { name: "🐟 Nama Ikan", value: data.nama },
+            { name: "⭐ Tier", value: data.tier },
+            { name: "⚖️ Berat", value: data.berat + " kg" },
+            { name: "💰 Harga", value: "Rp " + data.harga }
+          ],
+          timestamp: new Date().toISOString()
         }]
       };
-
-      fetch(WEBHOOK_URL, {
+      await fetch(WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
-      }).then(() => alert("✅ Pesan dikirim ke Discord!"))
-      .catch(err => alert("❌ Gagal: " + err));
-    }
-
-    // Auto kirim via URL param, misal ?nama=Ikan&tier=Epic
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('nama')) {
-      const nama = params.get('nama');
-      const tier = params.get('tier');
-      const berat = params.get('berat');
-      const harga = params.get('harga');
-      const autoPayload = {
-        username: "🐟 Fish It AutoHook",
-        avatar_url: "https://i.ibb.co/vqKFGXv/hook.png",
-        embeds: [{
-          title: "🎣 Tangkap Otomatis!",
-          description: `**Nama:** ${nama}\n**Tier:** ${tier}\n**Berat:** ${berat} kg\n**Harga:** Rp ${harga}`,
-          color: 0x00AEFF
-        }]
-      };
-      fetch(WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(autoPayload)
       });
     }
-  </script>
-</body>
-</html>    async function kirimKeDiscord(data) {
-      const payload = {
-        username: "Fish It Auto Hook",
-        avatar_url: "https://i.ibb.co/vqFXG7v/hook.png",
-        embeds: [{
-          title: "🎣 Tangkap Ikan Baru!",
-          description: "Sistem mendeteksi hasil tangkapan dari Fish It!",
-          color: 0x00aaff,
-          fields: [
-            { name: "🐠 Nama Ikan", value: `> ${data.nama}`, inline: false },
-            { name: "⭐ Tier", value: `> ${data.tier}`, inline: false },
-            { name: "⚖️ Berat", value: `> ${data.berat} Kg`, inline: false },
-            { name: "💰 Harga", value: `> ${data.harga}`, inline: false }
-          ],
-          footer: { text: "Fish It Auto Webhook v3 | " + new Date().toLocaleString() }
-        }]
-      };
 
+    // Kirim manual dari tombol
+    async function kirimManual() {
+      const data = {
+        nama: document.getElementById('nama').value,
+        tier: document.getElementById('tier').value,
+        berat: document.getElementById('berat').value,
+        harga: document.getElementById('harga').value
+      };
       try {
-        const res = await fetch(WEBHOOK_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        document.getElementById("status").innerText = res.ok
-          ? "✅ Data berhasil dikirim ke Discord!"
-          : "❌ Gagal kirim: " + res.status;
+        await kirimKeDiscord(data);
+        document.getElementById('status').innerText = "✅ Pesan dikirim ke Discord!";
       } catch (err) {
-        document.getElementById("status").innerText = "⚠️ Error: " + err.message;
+        document.getElementById('status').innerText = "❌ Gagal kirim: " + err;
       }
     }
 
-    // Ambil data ikan dari parameter URL
+    // Kirim otomatis lewat URL
     const params = new URLSearchParams(window.location.search);
-    const nama = params.get("nama");
-    const tier = params.get("tier");
-    const berat = params.get("berat");
-    const harga = params.get("harga");
-
-    if (nama && tier && berat && harga) {
-      kirimKeDiscord({ nama, tier, berat, harga });
-      document.querySelector("p").innerText = "🎣 Mengirim data tangkapan ke Discord...";
-    } else {
-      document.getElementById("status").innerText = "💤 Tidak ada data dari game.";
+    if (params.has('nama')) {
+      const data = {
+        nama: params.get('nama'),
+        tier: params.get('tier'),
+        berat: params.get('berat'),
+        harga: params.get('harga')
+      };
+      kirimKeDiscord(data)
+        .then(() => document.getElementById('status').innerText = "✅ Otomatis dikirim ke Discord!")
+        .catch(e => document.getElementById('status').innerText = "❌ Gagal kirim: " + e);
     }
   </script>
 </body>
