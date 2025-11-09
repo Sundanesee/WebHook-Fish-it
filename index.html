@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Secure Discord Webhook</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #0d1117;
+      color: #fff;
+      padding: 50px;
+    }
+    button {
+      background: #5865F2;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+    button:hover {
+      background: #4752C4;
+    }
+    .box {
+      background: #161b22;
+      border-radius: 10px;
+      padding: 20px;
+      margin: auto;
+      width: 90%;
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>🔒 Secure Webhook Tester</h2>
+    <p>Klik tombol di bawah untuk kirim pesan ke Discord.</p>
+    <button id="send">Kirim Pesan Aman</button>
+  </div>
+
+  <script>
+    // ================================
+    // GANTI BAGIAN DI BAWAH INI 🔻
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1437172334388842662/xapgUYeRWaiAA_1-FnPd4f80AMsdh_dEJvTjwznBNVjUjOM5rRuplsN5L_c7s5RZqYe0";
+    const SECRET_KEY = "vyp231oa21";
+    // ================================
+
+    document.getElementById("send").addEventListener("click", async () => {
+      const inputKey = prompt("Masukkan kunci rahasia:");
+      if (!inputKey) return alert("❌ Tidak ada key dimasukkan.");
+      if (inputKey !== SECRET_KEY) return alert("❌ Key salah, akses ditolak!");
+
+      const payload = {
+        username: "Fish It Hook",
+        avatar_url: "https://i.ibb.co/vqFXG7v/hook.png",
+        embeds: [{
+          title: "🎣 My Webhook",
+          description: "Kamu mendapatkan ikan **Langka!** 🐟",
+          color: 0x5865F2,
+          fields: [
+            { name: "🐠 Nama Ikan", value: "> Swordfish", inline: false },
+            { name: "⭐ Tier", value: "> Rare", inline: false },
+            { name: "⚖️ Berat", value: "> 7.4 Kg", inline: false },
+            { name: "💰 Harga Jual", value: "> $240", inline: false }
+          ],
+          footer: { text: "Webhook System | " + new Date().toLocaleString() }
+        }]
+      };
+
+      try {
+        const res = await fetch(WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          alert("✅ Pesan berhasil dikirim ke Discord!");
+        } else {
+          alert("❌ Gagal mengirim! Status: " + res.status);
+        }
+      } catch (err) {
+        alert("⚠️ Error: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
