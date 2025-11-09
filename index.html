@@ -2,39 +2,90 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Fish It Auto Webhook v3 (Silent Mode)</title>
+  <title>Auto Discord Webhook - Fish It</title>
   <style>
     body {
-      background: #0d1117;
-      color: #fff;
       font-family: Arial, sans-serif;
+      background: #0d1117;
+      color: white;
       text-align: center;
       padding: 40px;
     }
-    .status {
-      background: #161b22;
-      padding: 20px;
-      border-radius: 10px;
-      display: inline-block;
-      margin-top: 30px;
+    input, button {
+      margin: 5px;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      background: #5865F2;
+      color: white;
     }
   </style>
 </head>
 <body>
-  <h1>🐟 Fish It Auto Webhook v3</h1>
-  <p>Mode senyap aktif — siap menerima data ikan dari game.</p>
+  <h2>🎣 Auto Webhook Fish It</h2>
+  <p>Kirim data tangkapan ikan langsung ke Discord</p>
 
-  <div class="status">
-    <p id="status">💤 Menunggu data tangkapan...</p>
-  </div>
+  <input id="fishName" placeholder="Nama Ikan" />
+  <input id="fishTier" placeholder="Tier (Common/Epic/Legendary)" />
+  <input id="fishWeight" placeholder="Berat (kg)" />
+  <input id="fishPrice" placeholder="Harga (Rp)" />
+  <button onclick="sendToDiscord()">Kirim</button>
 
   <script>
-    // ======== GANTI DENGAN WEBHOOK DISCORD KAMU ========
+    // Ganti dengan webhook Discord kamu sendiri
     const WEBHOOK_URL = "https://discord.com/api/webhooks/1437172334388842662/xapgUYeRWaiAA_1-FnPd4f80AMsdh_dEJvTjwznBNVjUjOM5rRuplsN5L_c7s5RZqYe0";
-    // ===================================================
 
-    // Fungsi kirim otomatis ke Discord
-    async function kirimKeDiscord(data) {
+    function sendToDiscord() {
+      const nama = document.getElementById('fishName').value;
+      const tier = document.getElementById('fishTier').value;
+      const berat = document.getElementById('fishWeight').value;
+      const harga = document.getElementById('fishPrice').value;
+
+      const payload = {
+        username: "🐟 Fish It AutoHook",
+        avatar_url: "https://i.ibb.co/vqKFGXv/hook.png",
+        embeds: [{
+          title: `🎣 Tangkap Ikan Baru!`,
+          description: `**Nama:** ${nama}\n**Tier:** ${tier}\n**Berat:** ${berat} kg\n**Harga:** Rp ${harga}`,
+          color: 0x00AEFF
+        }]
+      };
+
+      fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).then(() => alert("✅ Pesan dikirim ke Discord!"))
+      .catch(err => alert("❌ Gagal: " + err));
+    }
+
+    // Auto kirim via URL param, misal ?nama=Ikan&tier=Epic
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('nama')) {
+      const nama = params.get('nama');
+      const tier = params.get('tier');
+      const berat = params.get('berat');
+      const harga = params.get('harga');
+      const autoPayload = {
+        username: "🐟 Fish It AutoHook",
+        avatar_url: "https://i.ibb.co/vqKFGXv/hook.png",
+        embeds: [{
+          title: "🎣 Tangkap Otomatis!",
+          description: `**Nama:** ${nama}\n**Tier:** ${tier}\n**Berat:** ${berat} kg\n**Harga:** Rp ${harga}`,
+          color: 0x00AEFF
+        }]
+      };
+      fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(autoPayload)
+      });
+    }
+  </script>
+</body>
+</html>    async function kirimKeDiscord(data) {
       const payload = {
         username: "Fish It Auto Hook",
         avatar_url: "https://i.ibb.co/vqFXG7v/hook.png",
